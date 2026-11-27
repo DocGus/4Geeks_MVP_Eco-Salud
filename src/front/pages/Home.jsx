@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/img/sansanarte.png";
+import logo from "../assets/img/sansanarte-final.png";
 import { Link } from "react-router-dom";
 
 // Página de inicio con acceso rápido a áreas clave del ecosistema.

@@ -351,3 +351,50 @@ form h4.text-lg.font-semibold,
   opacity: 0.9; /* más visible que el gris tenue, pero discreto */
   text-shadow: 0 0 0.5px rgba(255, 255, 255, 0.25); /* leve brillo */
 }
+
+/* =====================================================
+   SANARTE — CTA INICIAR SESIÓN | ESTILO ELEGANTE
+   ===================================================== */
+
+.brand-bottom-cta .btn-brand-large {
+  background: transparent !important;
+  color: #fffaf2 !important;
+  border: 1.5px solid rgba(255, 248, 238, 0.75) !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* Evitar que Bootstrap lo convierta en blanco */
+.brand-bottom-cta .btn-brand-large:hover,
+.brand-bottom-cta .btn-brand-large:focus,
+.brand-bottom-cta .btn-brand-large:active {
+  background: transparent !important;
+  color: #fffaf2 !important;
+}
+
+/* Logo en estado normal: conserva sus colores originales */
+.brand-bottom-cta .btn-brand-large img {
+  filter: none;
+  transition: filter 0.35s ease, transform 0.35s ease;
+}
+
+/* Iluminación cálida al pasar el mouse */
+.brand-bottom-cta .btn-brand-large:hover img {
+  filter: brightness(1.12) sepia(0.08);
+  transform: scale(1.15);
+}
+
+/* Halo cálido y elevación sutil */
+.brand-bottom-cta .btn-brand-large:hover {
+  border-color: rgba(255, 235, 210, 0.95) !important;
+  box-shadow:
+    0 0 12px rgba(255, 230, 200, 0.12),
+    0 8px 22px rgba(0, 0, 0, 0.28);
+  transform: translateY(-2px);
+}
+
+/* Animación al pulsar */
+.brand-bottom-cta .btn-brand-large:active {
+  transform: scale(0.98);
+}
