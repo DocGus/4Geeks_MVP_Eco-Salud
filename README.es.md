@@ -2,6 +2,32 @@
 
 Plataforma web para la gestión de solicitudes, antecedentes médicos y procesos de revisión y validación dentro de un ecosistema de colaboración entre pacientes, estudiantes de ciencias de la salud y profesionales de la salud.
 
+## 📚 Índice
+
+- [Descripción](#descripción)
+- [Funcionalidades principales](#funcionalidades-principales)
+- [Roles del sistema](#roles-del-sistema)
+- [Stack tecnológico](#stack-tecnológico)
+- [Requisitos previos](#requisitos-previos)
+- [Instalación local](#instalación-local)
+- [Configuración de desarrollo local](#configuración-de-desarrollo-local)
+- [Ejecutar la aplicación](#ejecutar-la-aplicación)
+- [Scripts disponibles](#scripts-disponibles)
+- [Base de datos](#base-de-datos)
+- [Migraciones](#migraciones)
+- [Variables de entorno](#variables-de-entorno)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Requerimientos de lógica de negocio](#requerimientos-de-lógica-de-negocio)
+- [Requerimientos técnicos](#requerimientos-técnicos)
+- [Desarrollo](#desarrollo)
+- [Solución de problemas](#solución-de-problemas)
+- [Seguridad](#seguridad)
+- [Despliegue](#despliegue)
+- [Roadmap técnico](#roadmap-técnico)
+- [Autor](#autor)
+
+
+
 ## Descripción
 
 **SanArte / Eco-Salud** es una aplicación web full-stack orientada a facilitar la recopilación, organización, revisión y validación de información relacionada con antecedentes médicos y procesos de atención colaborativa.
@@ -362,6 +388,117 @@ Las variables pueden variar según el entorno.
 └── README.md
 ```
 
+---
+
+## Requerimientos de lógica de negocio
+
+Esta sección documenta las reglas, comportamientos, roles y procesos que definen el funcionamiento de SanArte / Eco-Salud. Su objetivo es mantener una referencia clara de las decisiones de negocio y de los flujos funcionales de la plataforma.
+
+### Gestión de usuarios y roles
+
+La plataforma contempla diferentes perfiles de usuario, cada uno con responsabilidades y permisos diferenciados dentro del ecosistema:
+
+- **Paciente:** proporciona información, realiza solicitudes y participa en la revisión y confirmación de su información.
+- **Estudiante:** participa en la gestión de solicitudes y en la recopilación y organización de información.
+- **Profesional de la salud:** revisa y valida información y expedientes.
+- **Administrador:** gestiona usuarios, supervisa la plataforma y participa en la administración de los procesos del sistema.
+
+### Registro y administración de usuarios
+
+- Cada usuario debe contar con un registro individual dentro de la plataforma.
+- El correo electrónico debe ser único para identificar la cuenta.
+- El usuario debe contar con un rol definido.
+- El usuario puede tener un estado que determine su condición dentro de la plataforma, por ejemplo, pendiente de aprobación o aprobado.
+- La asignación de roles y estados debe ser consistente con los permisos y procesos definidos para cada perfil.
+
+### Inicialización de la administración de la plataforma
+
+Para comenzar a operar y administrar la plataforma, se requiere contar con un usuario administrador.
+
+El primer administrador permite iniciar las tareas de gestión y supervisión de usuarios y procesos desde las herramientas administrativas disponibles.
+
+Durante las pruebas de desarrollo se realizó la creación del primer usuario administrador utilizando el panel Flask-Admin.
+
+Consideraciones:
+
+- El usuario administrador debe contar con el rol correspondiente.
+- Su estado debe permitir el acceso a las funcionalidades administrativas.
+- Su correo debe ser único.
+- La creación de administradores debe realizarse de manera controlada.
+- Las credenciales utilizadas en pruebas deben ser diferentes de las credenciales de producción.
+
+### Consideraciones de negocio pendientes de consolidación
+
+Esta sección se actualizará conforme se validen las reglas de negocio definitivas relacionadas con:
+
+- Flujo de aprobación de usuarios.
+- Permisos específicos por rol.
+- Asignación y seguimiento de solicitudes.
+- Validación y confirmación de expedientes.
+- Transiciones entre estados de solicitudes.
+- Restricciones de acceso a información.
+- Reglas de colaboración entre pacientes, estudiantes y profesionales de la salud.
+
+---
+
+## Requerimientos técnicos
+
+Esta sección documenta el comportamiento técnico de la aplicación, su arquitectura, configuración, componentes y los descubrimientos realizados durante el desarrollo y depuración.
+
+### Arquitectura general
+
+SanArte / Eco-Salud utiliza una arquitectura full-stack compuesta por:
+
+- **Frontend:** React y Vite.
+- **Backend:** Python y Flask.
+- **Base de datos:** SQLite para pruebas locales y PostgreSQL para entornos configurados con este motor.
+- **Administración:** Flask-Admin para la gestión de registros y usuarios.
+- **Autenticación:** mecanismos implementados en el backend y manejo de tokens según la configuración del proyecto.
+
+Durante el desarrollo local, frontend y backend se ejecutan de manera independiente.
+
+### Backend y administración
+
+El backend utiliza Flask para gestionar la aplicación, sus endpoints, configuración y componentes administrativos.
+
+Flask-Admin permite acceder a una interfaz de administración para gestionar registros de los modelos configurados, incluidos los usuarios.
+
+La ruta local del panel administrativo durante el desarrollo es:
+
+`http://localhost:5000/admin/`
+
+### Configuración de sesiones y SECRET_KEY
+
+Flask requiere una clave secreta (`secret_key`) para determinadas funcionalidades relacionadas con sesiones y protección de información de sesión.
+
+Durante las pruebas de creación de usuarios en Flask-Admin se identificó un problema de configuración:
+
+- `app.py` configuraba la clave secreta de la aplicación.
+- `api/admin.py`, durante la inicialización de Flask-Admin, sobrescribía dicha clave.
+- La variable de entorno `FLASK_APP_KEY` podía existir con un valor vacío.
+- Cuando la variable estaba vacía, la asignación podía dejar `app.secret_key` sin una clave válida.
+- El registro del usuario podía guardarse en la base de datos, pero posteriormente Flask-Admin fallaba al intentar mostrar el mensaje de confirmación mediante el sistema de sesiones y mensajes Flash.
+
+### Solución aplicada
+
+Se eliminó la asignación redundante de `app.secret_key` dentro de la configuración de Flask-Admin.
+
+La configuración principal de la clave secreta permanece bajo la responsabilidad de `app.py`, evitando que otro módulo sobrescriba accidentalmente la configuración de sesiones de Flask.
+
+**Principio técnico aprendido:** la configuración central de la aplicación debe tener una única fuente de responsabilidad. Los módulos que integran funcionalidades adicionales no deben sobrescribir configuraciones globales sin una necesidad explícita.
+
+### Base de datos para pruebas locales
+
+Durante las pruebas de desarrollo se utilizó SQLite con una base de datos aislada:
+
+`/tmp/sanarte-test.db`
+
+Configuración utilizada:
+
+```bash
+export FORCE_SQLITE=1
+export SQLITE_PATH=/tmp/sanarte-test.db
+export AUTO_CREATE_SCHEMA=1
 ---
 
 ## Desarrollo
